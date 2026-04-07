@@ -2,7 +2,7 @@ name: my-env
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.10
   - pandas=2.3.2
   - numpy=1.26.4
   - geopandas=1.1.1
