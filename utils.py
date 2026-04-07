@@ -70,7 +70,7 @@ def create_dataset(station_folder):
         if dfs_per_var:
             # Merge all variables for this station
             station_df = reduce(lambda left,right: pd.merge(left, right, on='datetime', how='outer'), dfs_per_var.values())
-            station_df['station'] = station_name  # add station column
+            station_df['station'] = station_name  
             all_stations.append(station_df)
     
     # Combine all stations
@@ -86,7 +86,7 @@ def create_dataset(station_folder):
         "sm_5cm": "mean",
         "ts_5cm": "mean",
         "ta": "mean",
-        "p": "sum"   # <-- use sum for precipitation
+        "p": "sum"   
         }).reset_index()
     )
     
@@ -137,7 +137,6 @@ def filter_stations(df):
     return df_filtered
 
 def latlon_to_meters2(lon, lat, epsg_out=3857):
-    # convert lat/lon (EPSG:4326) to a metric CRS (default WebMercator EPSG:3857).
     transformer = Transformer.from_crs("EPSG:4326", f"EPSG:{epsg_out}", always_xy=True)
     xs, ys = transformer.transform(lon, lat)
     return [xs, ys]
@@ -145,7 +144,7 @@ def latlon_to_meters2(lon, lat, epsg_out=3857):
 def compute_scores(df):
     """
     lower_q_cal, upper_q_cal, y_true : 1D numpy arrays (same length)
-    returns: nonconformity scores: max(lower_q - y, y - upper_q), clipped >=0
+    returns: nonconformity scores
     """
     lower_res = df["lower_quantile"].values - df["y_true"].values
     upper_res = df["y_true"].values - df["upper_quantile"].values
@@ -186,9 +185,13 @@ def apply_lcp(df_cal, df_test, alpha,
         # spatio_tempo kernel
         if bandwidth_space is not None and bandwidth_time is not None:
             w_space = np.exp(-0.5 * (d_space / bandwidth_space) ** 2)
+            
             dt = (test_date - df_sub["time"]).dt.days.values
-            w_time = np.exp(-0.5 * (dt / bandwidth_time) ** 2)       
-            w = w_space * w_time
+            if np.any(dt > 1):
+                w_time = np.exp(-0.5 * (dt / bandwidth_time) ** 2) 
+                w = w_space * w_time
+            else:
+                w=[]
 
         # spatial kernel
         elif bandwidth_space is not None:
@@ -198,10 +201,12 @@ def apply_lcp(df_cal, df_test, alpha,
         # temporal kernel
         elif bandwidth_time is not None:
             dt = (test_date - df_sub["time"]).dt.days.values
-            w_time = np.exp(-0.5 * (dt / bandwidth_time) ** 2)
-            w = w_time
-        
-        # here - above me
+            if np.any(dt > 1):
+                w_time = np.exp(-0.5 * (dt / bandwidth_time) ** 2) 
+                w = w_time
+            else:
+                w=[]
+
         if len(w) == 0:
             # no calibration points available
             q_adj = 0
@@ -228,13 +233,13 @@ def apply_lcp(df_cal, df_test, alpha,
 
             inds = np.where(keep)[0]
             if len(inds) == 0:
-                # fallback: keep the maximum weight
+                # keep the maximum weight
                 inds = [int(np.argmax(w))]
             w_sel = w[inds].astype(float)
             V_sel = df_sub.loc[inds]["V"].values
             
             p = w_sel / w_sel.sum()
-            # compute jump points of the weighted CDF centered at test:
+            # compute jump points of the weighted CDF centered
             sorter = np.argsort(V_sel)
             p_sorted = p[sorter]
             cum = np.cumsum(p_sorted)
@@ -246,7 +251,7 @@ def apply_lcp(df_cal, df_test, alpha,
             
             if mask.any():
                 alpha_tilde = jumps[mask][0]
-            
+    
             sorter = np.argsort(V_sel)
             vals = V_sel[sorter]
             w = p[sorter]
@@ -255,7 +260,6 @@ def apply_lcp(df_cal, df_test, alpha,
             q=1 - alpha_tilde
             cutoff = q * cumw[-1]
             idx = np.searchsorted(cumw, cutoff, side='right')
-            #q_hat = vals[min(idx, len(vals)-1)]
             q_adj = vals[idx]
 
 
@@ -274,6 +278,5 @@ def apply_lcp(df_cal, df_test, alpha,
     
     df_out = df_out[df_out['q_local']!= 0]
     df_out['PI_lower'] = df_out['PI_lower'].apply(lambda x: 0 if x < 0 else x)
-
 
     return df_out
