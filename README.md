@@ -5,3 +5,9 @@ This repository contains the code used in the paper:
 
 The code implements conformal prediction with spatial, temporal, and spatio-temporal localization to quantify uncertainty in soil moisture forecasting under exchangeability violations.
 
+## Environment Setup (Conda)
+Create and activate the environment:
+
+```bash
+conda env create -f environment.yml
+conda activate my-env

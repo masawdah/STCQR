@@ -1,0 +1,11 @@
+name: my-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas=2.3.2
+  - numpy=1.26.4
+  - geopandas=1.1.1
+  - cartopy=0.25.0
+  - pytorch=2.8.0
+  - scikit-learn=1.7.2
