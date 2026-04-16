@@ -11,3 +11,9 @@ Create and activate the environment:
 ```bash
 conda env create -f environment.yml
 conda activate my-env
+
+## Data Source
+The soil moisture data were obtained from the International Soil Moisture Network (ISMN). ISMN integrates ground-based observations from multiple monitoring networks worldwide, ensuring high-quality and standardized soil moisture data.
+
+## Reproducibility Note
+Results may vary slightly when running the notebook in different environments or software setups (e.g., due to differences in library versions or hardware). However, the overall findings remain consistent: STCQR achieves coverage closer to the nominal level while maintaining sharper (narrower) prediction intervals.

@@ -56,7 +56,10 @@ class PinballLoss(nn.Module):
 
 # Define LSTM Model
 class QuantileLSTM(nn.Module):
-    def __init__(self, input_size, hidden_size, quantiles):
+    def __init__(self,
+                 input_size = 3,
+                 hidden_size = 64,
+                 quantiles = [0.05, 0.95]):
         super().__init__()
         self.hidden_size = hidden_size
         self.quantiles = quantiles
