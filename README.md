@@ -11,6 +11,7 @@ Create and activate the environment:
 ```bash
 conda env create -f environment.yml
 conda activate my-env
+```
 
 ## Data Source
 The soil moisture data were obtained from the International Soil Moisture Network (ISMN). ISMN integrates ground-based observations from multiple monitoring networks worldwide, ensuring high-quality and standardized soil moisture data.
