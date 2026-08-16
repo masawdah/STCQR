@@ -175,10 +175,8 @@ def apply_lcp(df_cal, df_test, alpha,
         # ---- compute  weights ----
         mask = df_cal["time"] < test_date
         if time_window_days is not None:
-            #mask &= (test_date - df_qr_cal["time"]).dt.days <= time_window_days
             mask &= (test_date - df_cal["time"]).dt.days <= time_window_days
             
-        #df_sub = df_cal.loc[mask]
         df_sub = df_cal.loc[mask].copy()
         coords_cal = df_sub[["x", "y"]].values
         test_coord = np.array([test_x, test_y])
@@ -216,8 +214,6 @@ def apply_lcp(df_cal, df_test, alpha,
             inds = df_sub.index.values
             V_sel = scores_cal[inds]
             
-            #df_sub["w"] = w
-            #df_sub["V"] = V_sel
             df_sub.loc[:, "w"] = w
             df_sub.loc[:, "V"] = V_sel
             
